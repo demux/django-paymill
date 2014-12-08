@@ -1,6 +1,9 @@
-#encoding: utf-8
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from setuptools import setup, find_packages
 from paymill import get_version
+
 
 setup(
     name = "django-paymill",
@@ -9,7 +12,7 @@ setup(
     author = "Úlfur Kristjánsson",
     author_email = "ulfurk@ulfurk.com",
     url = "https://github.com/ulfur/django-paymill",
-    packages = find_packages( ),
+    packages = find_packages(),
     include_package_data=True,
     classifiers=[
             'Development Status :: 4 - Beta',
@@ -18,5 +21,5 @@ setup(
             'Operating System :: OS Independent',
             'Programming Language :: Python',
         ],
-    install_requires=['django >= 1.6', 'django-crispy-forms', 'pymill']
+    install_requires=['django >= 1.4', 'django-crispy-forms', 'pymill']
 )

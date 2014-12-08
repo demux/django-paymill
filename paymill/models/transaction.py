@@ -16,7 +16,7 @@ class Transaction(PaymillModel):
     response_code = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
 
-    livemode = models.BooleanField()
+    livemode = models.BooleanField(default=False)
     origin_amount = models.PositiveIntegerField()
 
     payment = models.ForeignKey(Payment, related_name='transactions')

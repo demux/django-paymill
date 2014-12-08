@@ -49,8 +49,7 @@ def install_webhook():
     paymill = Pymill(settings.PAYMILL_PRIVATE_KEY)
     secret = uuid.uuid4().hex
     path = reverse('paymill-webhook', args=[secret])
-    url = '%s://%s%s' % (settings.PAYMILL_WEBHOOK_PROTOCOL,
-                         settings.PAYMILL_WEBHOOK_HOST, path)
+    url = ''.join([settings.PAYMILL_WEBHOOK_HOST, path])
     paymill.new_webhook(url, WEBHOOK_EVENTS)
     return secret
 

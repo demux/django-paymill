@@ -21,7 +21,7 @@ class Refund(PaymillModel):
     )
     status = models.CharField(choices=STATUS_CHOICES, max_length=16)
     description = models.TextField(blank=True)
-    livemode = models.BooleanField()
+    livemode = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Refund - %s' % self.status
