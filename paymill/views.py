@@ -19,26 +19,37 @@ from .models import *
 
 from paymill import validate_webhook
 
-
 class PaymillTransactionView(View):
     def post(self, request, *args, **kwargs):
         amount = request.POST.get('payment_amount', 0)
         currency = request.POST.get('payment_currency', 'USD')
         description = request.POST.get('payment_description', '')
+        offer = request.POST.get('payment_subscription_code', '')
+        email = request.POST.get('payment_client_email', '')
+        name = request.POST.get('payment_client_name', '')
         next = request.POST.get(
             'next', getattr(settings, 'PAYMILL_SUCCESS', '/'))
 
         p = pymill.Pymill(settings.PAYMILL_PRIVATE_KEY)
-        card = p.newcard(request.POST.get('paymillToken'))["data"]
-        transaction = p.transact(
-            amount=amount,
-            currency=currency,
-            description=description,
-            payment=card["id"]
-        )['data']
+        #we create this in any case
+        client = p.new_client(email, name)
+        card = p.new_card(request.POST.get('paymillToken'), client.id)
 
-        if getattr(settings, 'PAYMILL_SAVE_TRANSACTIONS', True):
-            transaction = Transaction.parse_transaction(transaction)
+        if offer:
+            paymill_offer = Offer.objects.get(id=offer)
+            client = Client.update_or_create(client)
+            payment = Payment.update_or_create(card)
+            paymill_offer.subscribe(client)
+        else:
+            transaction = p.transact(
+                amount=amount,
+                currency=currency,
+                description=description,
+                payment=card
+            )
+
+            if getattr(settings, 'PAYMILL_SAVE_TRANSACTIONS', True):
+                transaction = Transaction.parse_transaction(transaction)
 
         return HttpResponseRedirect(next)
 
@@ -59,26 +70,23 @@ class WebhookView(View):
         return super(WebhookView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        if validate_webhook(kwargs.pop('secret')):
-            try:
-                event = json.loads(request.body)
-                # TODO: Check for edge cases and handle errors
-                event = event['event']
-                event_name = event['event_type'].replace('.', '_')
+        #if validate_webhook(kwargs.pop('secret')):
+        try:
+            event = json.loads(request.body)
+            # TODO: Check for edge cases and handle errors
+            event = event['event']
+            event_name = event['event_type'].replace('.', '_')
 
-                # Process Paymill objects
-                f = getattr(self, event_name, None)
-                print event_name
-                print event
-                if f:
-                    f(event)
-                signal = get_signal(event_name)
-                signal.send(sender=self, event=event)
-            except Exception as e:
-                print 'ERROR'
-                pass  # TODO: Log errors
-            pickle.dump(
-                event, open('%s-%s.log' % (event_name, event['event_resource']['id']), 'wb'))
+            # Process Paymill objects
+            f = getattr(self, event_name, None)
+
+            if f:
+                f(event)
+            signal = get_signal(event_name)
+            signal.send(sender=self, event=event)
+        except Exception as e:
+            print 'ERROR: ' + unicode(e)
+            pass  # TODO: Log errors
 
         # Paymill doesn't care if we succeed or fail so we return an empty
         # 200:OK

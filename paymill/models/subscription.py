@@ -8,7 +8,7 @@ from .base import PaymillModel
 from .offer import Offer
 from .client import Client
 from .payment import Payment
-
+from django.utils import timezone
 
 class Subscription(PaymillModel):
     livemode = models.BooleanField(default=False)
@@ -32,8 +32,8 @@ class Subscription(PaymillModel):
         self.cancel()
 
     def cancel(self):
-        self.paymill.cancelsubnow(self.id)
-        self.canceled_at = datetime.now()
+        self.paymill.cancel_subscription_now(self.id)
+        self.canceled_at = timezone.now()
         self.save()
 
     def __unicode__(self):

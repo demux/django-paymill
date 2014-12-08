@@ -19,7 +19,7 @@
                 $(".payment-errors").text(error.apierror);
                 $("form input[type=submit]").removeAttr("disabled");
             } else {
-                var form = $("form");
+                var form = $("#pmill_form");
                 // Output token
                 var token = result.token;
                 // Insert token into form in order to submit to server
@@ -30,7 +30,7 @@
         }
 
         $(function(){
-            $("form").submit( function(event) {
+            $("#pmill_form").submit( function(event) {
                 // Deactivate submit button to avoid further clicks
                 $('form input[type=submit]').attr("disabled", "disabled");
                 paymill.createToken({
