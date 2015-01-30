@@ -31,9 +31,9 @@ WEBHOOK_EVENTS = (
     'app.merchant.app.disabled'
 )
 
+
 def get_webhook():
     paymill = Pymill(settings.PAYMILL_PRIVATE_KEY)
-    secret = None
     webhooks = paymill.get_webhooks()
     for hook in webhooks:
         url = urlparse(hook.url)
@@ -43,7 +43,12 @@ def get_webhook():
                 return match.kwargs.get('secret', None)
         except:
             pass
-    return secret
+    return None
+
+
+def validate_webhook(secret):
+    return secret == get_webhook()
+
 
 def install_webhook():
     paymill = Pymill(settings.PAYMILL_PRIVATE_KEY)
@@ -53,10 +58,13 @@ def install_webhook():
     paymill.new_webhook(url, WEBHOOK_EVENTS)
     return secret
 
+
 def init_webhook():
     print 'Looking for webhook'
     secret = get_webhook()
     if not secret:
         print 'Webhook not found, installing'
         secret = install_webhook()
+    print 'Webhook ready: %s' % secret
+
     return secret

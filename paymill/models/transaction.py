@@ -9,6 +9,7 @@ from .client import Client
 from .payment import Payment
 from .choices import *
 
+
 @python_2_unicode_compatible
 class Transaction(PaymillModel):
     status = models.CharField(max_length=16)

@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .signals import get_signal
 from .models import *
 
-from paymill import validate_webhook
+from paymill.webhooks import validate_webhook
 
 class PaymillTransactionView(View):
     def post(self, request, *args, **kwargs):
