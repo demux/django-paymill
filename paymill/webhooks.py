@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import re
 import uuid
 from urlparse import urlparse
-from django.core.urlresolvers import reverse, resolve
+from django.core.urlresolvers import reverse_lazy, resolve
 from django.conf import settings
 
 from pymill import Pymill
@@ -53,13 +53,17 @@ def validate_webhook(secret):
 def install_webhook():
     paymill = Pymill(settings.PAYMILL_PRIVATE_KEY)
     secret = uuid.uuid4().hex
-    path = reverse('paymill-webhook', args=[secret])
+    path = reverse_lazy('paymill-webhook', args=[secret])
     url = ''.join([settings.PAYMILL_WEBHOOK_HOST, path])
     paymill.new_webhook(url, WEBHOOK_EVENTS)
     return secret
 
 
 def init_webhook():
+    if not hasattr(settings, 'PAYMILL_WEBHOOK_HOST'):
+        print 'Paymill webhooks not configured'
+        return
+
     print 'Looking for webhook'
     secret = get_webhook()
     if not secret:

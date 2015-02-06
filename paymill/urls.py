@@ -7,7 +7,7 @@ from .views import PaymillTransactionView, PaymillAddCardView, WebhookView
 
 
 urlpatterns = patterns('',
-    url(r'^transaction$', PaymillTransactionView.as_view(), name='paymill-payment'),
-    url(r'^addcard$', PaymillAddCardView.as_view(), name='paymill-add-card'),
-    url(r'^webhook$', WebhookView.as_view(), name='paymill-webhook'),
+    url(r'^transaction/$', PaymillTransactionView.as_view(), name='paymill-payment'),
+    url(r'^addcard/$', PaymillAddCardView.as_view(), name='paymill-add-card'),
+    url(r'^webhook/$', WebhookView.as_view(), name='paymill-webhook'),
 )

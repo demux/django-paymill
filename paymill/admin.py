@@ -63,6 +63,7 @@ class PaymentAdminForm(forms.ModelForm):
 
     class Meta:
         model = Payment
+        exclude = []
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -172,6 +173,7 @@ class TransactionAdminForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
+        exclude = []
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -230,13 +232,23 @@ class TransactionAdmin(admin.ModelAdmin):
     )
 
     def original_amount(self, obj):
-        return '{:20,.2f} {}'.format(obj.origin_amount / 100, obj.currency)
+        try:
+            return '{:20,.2f} {}'.format(obj.origin_amount / 100, obj.currency)
+        except TypeError:
+            return ''
 
     def total_amount(self, obj):
-        return '{:20,.2f} {}'.format((obj.origin_amount - obj.refunded) / 100, obj.currency)
+        try:
+            return '{:20,.2f} {}'.format(
+                (obj.origin_amount - obj.refunded) / 100, obj.currency)
+        except TypeError:
+            return ''
 
     def refunded_total(self, obj):
-        return '{:20,.2f} {}'.format(obj.refunded / 100, obj.currency)
+        try:
+            return '{:20,.2f} {}'.format(obj.refunded / 100, obj.currency)
+        except TypeError:
+            return ''
 
     def refunds_(self, obj):
         s = []

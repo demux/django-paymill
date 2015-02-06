@@ -58,11 +58,27 @@ class Payment(PaymillModel):
     def _delete_paymill_object(self, *args, **kwargs):
         self.paymill.delete_card(self.id)
 
+    @property
+    def fa_icon(self):
+        if self.type == 'creditcard':
+            if self.card_type in ['visa', 'mastercard', 'amex', 'discover']:
+                return 'fa-cc-%s' % self.card_type
+            else:
+                return 'fa-credit-card'
+        elif self.type == 'debit':
+            return 'fa-credit-card'
+
+    @property
+    def masked(self):
+        if self.type == 'creditcard':
+            return '**** ***** **** %s' % self.last4
+        elif self.type == 'debit':
+            return self.iban or self.account
+
     def __str__(self):
         if self.type == 'creditcard':
-            return 'Credit Card - %s - %s (**** ***** **** %s)' % (
-                self.card_holder, self.card_type, self.last4)
+            return 'Credit Card - %s - %s %s' % (
+                self.card_holder, self.card_type, self.masked)
         elif self.type == 'debit':
-            num = self.iban or self.account
             code = self.bic or self.code
-            return 'Debit Card - %s - %s - %s' % (self.holder, num, code)
+            return 'Debit Card - %s - %s - %s' % (self.holder, self.masked, code)
