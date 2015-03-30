@@ -75,6 +75,10 @@ class Payment(PaymillModel):
         elif self.type == 'debit':
             return self.iban or self.account
 
+    @property
+    def _holder(self):
+        return self.card_holder or self.holder
+
     def __str__(self):
         if self.type == 'creditcard':
             return 'Credit Card - %s - %s %s' % (

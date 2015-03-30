@@ -72,12 +72,19 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('card_holder', 'last4', 'id', 'created_at')
     search_fields = ('card_holder', 'last4')
     fieldsets = (
-        (None, {
+        ('Credit Card Fields', {
             'fields': (
                 ('client', 'type'),
                 ('card_type', 'last4'),
                 ('expire_month', 'expire_year'),
                 ('card_holder', 'country'),
+            )
+        }),
+        ('Debit Card Fields', {
+            'fields': (
+                ('code', 'account'),
+                'holder',
+                ('iban', 'bic'),
             )
         }),
         ('Create a new Transaction', {
@@ -102,10 +109,17 @@ class PaymentAdmin(admin.ModelAdmin):
     )
     readonly_fields = (
         'type',
+        # Credit Cards
         'card_type', 'last4',
         'expire_month', 'expire_year',
-        'card_holder', 'country', 'transactions_',
+        'card_holder', 'country',
 
+        # Debit Cards
+        'code', 'account', 'holder', 'iban', 'bic',
+
+        'transactions_',
+
+        # Advanced
         'id', 'client', 'created_at', 'updated_at',
     )
 
